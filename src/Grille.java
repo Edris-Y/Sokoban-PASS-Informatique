@@ -1,4 +1,3 @@
-// Auteur : Edris (Personne 1 - Mécanique du jeu)
 class Grille {
 
     static final char MUR = '#';
@@ -13,7 +12,6 @@ class Grille {
     int ligneJoueur;
     int colonneJoueur;
 
-    // Transforme un niveau (texte) en grille jouable
     Grille(String[] niveau) {
         int hauteur = niveau.length;
         int largeur = 0;

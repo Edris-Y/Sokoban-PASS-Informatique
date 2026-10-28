@@ -1,4 +1,3 @@
-// Auteur : Adam (boucle de jeu et saisie)
 import java.util.Scanner;
 
 public class Jeu {
