@@ -1,4 +1,4 @@
-// Auteur : Badice (Personne 3 - Menu principal)
+// Auteur : Badice (Menu principal)
 import java.util.Scanner;
 
 public class Main {

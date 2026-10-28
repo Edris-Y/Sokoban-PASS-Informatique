@@ -1,4 +1,4 @@
-// Auteur : Edris (Personne 1 - Mécanique du jeu)
+// Auteur : Edris (Mécanique du jeu)
 public class Grille {
 
     static final char MUR = '#';

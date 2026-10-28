@@ -1,9 +1,9 @@
-// Auteur : Adam (Personne 2 - Boucle de jeu et saisie)
+// Auteur : Adam (boucle de jeu et saisie)
 import java.util.Scanner;
 
 public class Jeu {
 
-    // Commandes acceptées : z, q, s, d, x
+    // Commandes acceptees : z, q, s, d, x
     static boolean commandeValide(String saisie) {
         if (saisie.length() != 1) {
             return false;

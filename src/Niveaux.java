@@ -1,4 +1,4 @@
-// Auteur : Badice (Personne 3 - Niveaux)
+// Auteur : Badice (Niveaux)
 public class Niveaux {
 
     // Chaque niveau : 1 joueur, autant de caisses que d'objectifs, murs, cases libres
