@@ -3,7 +3,6 @@ import java.util.Scanner;
 
 public class Jeu {
 
-    // Commandes acceptees : z, q, s, d, x
     static boolean commandeValide(String saisie) {
         if (saisie.length() != 1) {
             return false;
@@ -12,7 +11,7 @@ public class Jeu {
         return c == 'z' || c == 'q' || c == 's' || c == 'd' || c == 'x';
     }
 
-    // Boucle de jeu d'un niveau
+    // Boucle pr un niveau
     static void jouer(int numeroNiveau, Scanner scanner) {
         Grille g = new Grille(Niveaux.chargerNiveau(numeroNiveau));
         int mouvements = 0;
