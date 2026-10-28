@@ -1,9 +1,7 @@
-// Auteur : Badice (Niveaux)
 public class Niveaux {
 
-    // Chaque niveau : 1 joueur, autant de caisses que d'objectifs, murs, cases libres
     static final String[][] NIVEAUX = {
-        {   // Niveau 1 : 1 caisse
+        {   // Niveau 1
             "########",
             "#      #",
             "#  .   #",
@@ -12,7 +10,7 @@ public class Niveaux {
             "#      #",
             "########"
         },
-        {   // Niveau 2 : 2 caisses
+        {   // Niveau 2 
             "#########",
             "#       #",
             "# .  $  #",
@@ -21,12 +19,12 @@ public class Niveaux {
             "#       #",
             "#########"
         },
-        {   // Niveau 3 : 2 caisses et des murs intérieurs
+        {   // Niveau 3 
             "##########",
             "#  #     #",
-            "#  # $ . #",
+            "#  #   $ #",
             "#    $ . #",
-            "# @  #   #",
+            "# @  # . #",
             "##########"
         }
     };
@@ -35,7 +33,6 @@ public class Niveaux {
         return NIVEAUX.length;
     }
 
-    // numero va de 1 à nombreNiveaux()
     static String[] chargerNiveau(int numero) {
         return NIVEAUX[numero - 1];
     }
