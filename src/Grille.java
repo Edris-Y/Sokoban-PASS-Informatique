@@ -71,7 +71,7 @@ class Grille {
         return grille[l][c] != MUR;
     }
 
-    // La caisse en (l, c) peut être poussée si la case derrière est libre
+    // La caisse en (l, c) peut être pousser si la case derriere est libre
     boolean peutPousser(int l, int c, int dl, int dc) {
         if (grille[l][c] != CAISSE) {
             return false;
@@ -81,13 +81,13 @@ class Grille {
         return deplacementValide(nl, nc) && grille[nl][nc] == LIBRE;
     }
 
-    // Déplace la caisse de (l, c) vers (l+dl, c+dc)
+    // Deplace la caisse de (l, c) vers (l+dl, c+dc)
     void deplacerCaisse(int l, int c, int dl, int dc) {
         grille[l][c] = LIBRE;
         grille[l + dl][c + dc] = CAISSE;
     }
 
-    // Déplace le joueur (z, q, s, d). Renvoie true s'il a bougé.
+    // Deplace le joueur (z, q, s, d) et renvoie true s'il a bouger.
     boolean deplacerJoueur(char commande) {
         int dl = 0;
         int dc = 0;
@@ -125,7 +125,7 @@ class Grille {
         return true;
     }
 
-    // Victoire : plus aucune caisse hors d'un objectif
+    // Victoire quand aucune caisse reste
     boolean partieTerminee() {
         for (int l = 0; l < grille.length; l++) {
             for (int c = 0; c < grille[l].length; c++) {

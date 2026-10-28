@@ -76,7 +76,7 @@ public class Main {
         System.out.println("Commandes : z haut | s bas | q gauche | d droite | x quitter");
     }
 
-    // Lit un entier, redemande tant que l'entrée n'est pas un nombre
+    // lit un entier redemande tant que l'entrer n'est pas un nombre
     static int lireEntier(Scanner scanner) {
         while (!scanner.hasNextInt()) {
             scanner.next();
