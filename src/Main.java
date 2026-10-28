@@ -2,234 +2,226 @@ import java.util.Scanner;
 
 public class Main {
 
-    static class Grille {
+    static final char MUR = '#';
+    static final char LIBRE = ' ';
+    static final char JOUEUR = '@';
+    static final char CAISSE = '$';
+    static final char OBJECTIF = '.';
+    static final char CAISSE_OBJ = '*';
 
-        static final char MUR = '#';
-        static final char LIBRE = ' ';
-        static final char JOUEUR = '@';
-        static final char CAISSE = '$';
-        static final char OBJECTIF = '.';
-        static final char CAISSE_OBJ = '*';
+    static char[][] grille;
+    static boolean[][] objectifs;
+    static int ligneJoueur;
+    static int colonneJoueur;
 
-        char[][] grille;
-        boolean[][] objectifs;
-        int ligneJoueur;
-        int colonneJoueur;
+    // Transforme un niveau (texte) en grille jouable
+    static void initialiserGrille(String[] niveau) {
+        int hauteur = niveau.length;
+        int largeur = 0;
+        for (int i = 0; i < hauteur; i++) {
+            if (niveau[i].length() > largeur) {
+                largeur = niveau[i].length();
+            }
+        }
 
-        Grille(String[] niveau) {
-            int hauteur = niveau.length;
-            int largeur = 0;
-            for (int i = 0; i < hauteur; i++) {
-                if (niveau[i].length() > largeur) {
-                    largeur = niveau[i].length();
+        grille = new char[hauteur][largeur];
+        objectifs = new boolean[hauteur][largeur];
+
+        for (int l = 0; l < hauteur; l++) {
+            for (int c = 0; c < largeur; c++) {
+                char ch = LIBRE;
+                if (c < niveau[l].length()) {
+                    ch = niveau[l].charAt(c);
                 }
-            }
 
-            grille = new char[hauteur][largeur];
-            objectifs = new boolean[hauteur][largeur];
-
-            for (int l = 0; l < hauteur; l++) {
-                for (int c = 0; c < largeur; c++) {
-                    char ch = LIBRE;
-                    if (c < niveau[l].length()) {
-                        ch = niveau[l].charAt(c);
-                    }
-
-                    if (ch == OBJECTIF) {
-                        objectifs[l][c] = true;
-                        ch = LIBRE;
-                    } else if (ch == CAISSE_OBJ) {
-                        objectifs[l][c] = true;
-                        ch = CAISSE;
-                    } else if (ch == JOUEUR) {
-                        ligneJoueur = l;
-                        colonneJoueur = c;
-                    }
-                    grille[l][c] = ch;
+                if (ch == OBJECTIF) {
+                    objectifs[l][c] = true;
+                    ch = LIBRE;
+                } else if (ch == CAISSE_OBJ) {
+                    objectifs[l][c] = true;
+                    ch = CAISSE;
+                } else if (ch == JOUEUR) {
+                    ligneJoueur = l;
+                    colonneJoueur = c;
                 }
+                grille[l][c] = ch;
             }
         }
+    }
 
-        // Affiche la grille
-        void afficherGrille() {
-            for (int l = 0; l < grille.length; l++) {
-                for (int c = 0; c < grille[l].length; c++) {
-                    char ch = grille[l][c];
-                    if (objectifs[l][c] && ch == LIBRE) {
-                        ch = OBJECTIF;
-                    }
-                    if (objectifs[l][c] && ch == CAISSE) {
-                        ch = CAISSE_OBJ;
-                    }
-                    System.out.print(ch);
+    // Affiche la grille
+    static void afficherGrille() {
+        for (int l = 0; l < grille.length; l++) {
+            for (int c = 0; c < grille[l].length; c++) {
+                char ch = grille[l][c];
+                if (objectifs[l][c] && ch == LIBRE) {
+                    ch = OBJECTIF;
                 }
-                System.out.println();
+                if (objectifs[l][c] && ch == CAISSE) {
+                    ch = CAISSE_OBJ;
+                }
+                System.out.print(ch);
             }
+            System.out.println();
+        }
+    }
+
+    // La case est dans la grille et n'est pas un mur
+    static boolean deplacementValide(int l, int c) {
+        if (l < 0 || l >= grille.length || c < 0 || c >= grille[0].length) {
+            return false;
+        }
+        return grille[l][c] != MUR;
+    }
+
+    // La caisse en (l, c) peut etre pousser si la case derriere est libre
+    static boolean peutPousser(int l, int c, int dl, int dc) {
+        if (grille[l][c] != CAISSE) {
+            return false;
+        }
+        int nl = l + dl;
+        int nc = c + dc;
+        return deplacementValide(nl, nc) && grille[nl][nc] == LIBRE;
+    }
+
+    // Deplace la caisse de (l, c) vers (l+dl, c+dc)
+    static void deplacerCaisse(int l, int c, int dl, int dc) {
+        grille[l][c] = LIBRE;
+        grille[l + dl][c + dc] = CAISSE;
+    }
+
+    // Deplace le joueur (z, q, s, d) et renvoie true s'il a bouger.
+    static boolean deplacerJoueur(char commande) {
+        int dl = 0;
+        int dc = 0;
+
+        if (commande == 'z') {
+            dl = -1;
+        } else if (commande == 's') {
+            dl = 1;
+        } else if (commande == 'q') {
+            dc = -1;
+        } else if (commande == 'd') {
+            dc = 1;
+        } else {
+            return false;
         }
 
-        // La case est dans la grille et n'est pas un mur
-        boolean deplacementValide(int l, int c) {
-            if (l < 0 || l >= grille.length || c < 0 || c >= grille[0].length) {
-                return false;
-            }
-            return grille[l][c] != MUR;
+        int nl = ligneJoueur + dl;
+        int nc = colonneJoueur + dc;
+
+        if (!deplacementValide(nl, nc)) {
+            return false;
         }
 
-        // La caisse en (l, c) peut etre pousser si la case derriere est libre
-        boolean peutPousser(int l, int c, int dl, int dc) {
-            if (grille[l][c] != CAISSE) {
+        if (grille[nl][nc] == CAISSE) {
+            if (!peutPousser(nl, nc, dl, dc)) {
                 return false;
             }
-            int nl = l + dl;
-            int nc = c + dc;
-            return deplacementValide(nl, nc) && grille[nl][nc] == LIBRE;
+            deplacerCaisse(nl, nc, dl, dc);
         }
 
-        // Deplace la caisse de (l, c) vers (l+dl, c+dc)
-        void deplacerCaisse(int l, int c, int dl, int dc) {
-            grille[l][c] = LIBRE;
-            grille[l + dl][c + dc] = CAISSE;
-        }
+        grille[ligneJoueur][colonneJoueur] = LIBRE;
+        grille[nl][nc] = JOUEUR;
+        ligneJoueur = nl;
+        colonneJoueur = nc;
+        return true;
+    }
 
-        // Deplace le joueur (z, q, s, d) et renvoie true s'il a bouger.
-        boolean deplacerJoueur(char commande) {
-            int dl = 0;
-            int dc = 0;
-
-            if (commande == 'z') {
-                dl = -1;
-            } else if (commande == 's') {
-                dl = 1;
-            } else if (commande == 'q') {
-                dc = -1;
-            } else if (commande == 'd') {
-                dc = 1;
-            } else {
-                return false;
-            }
-
-            int nl = ligneJoueur + dl;
-            int nc = colonneJoueur + dc;
-
-            if (!deplacementValide(nl, nc)) {
-                return false;
-            }
-
-            if (grille[nl][nc] == CAISSE) {
-                if (!peutPousser(nl, nc, dl, dc)) {
+    // Victoire quand aucune caisse reste
+    static boolean partieTerminee() {
+        for (int l = 0; l < grille.length; l++) {
+            for (int c = 0; c < grille[l].length; c++) {
+                if (grille[l][c] == CAISSE && !objectifs[l][c]) {
                     return false;
                 }
-                deplacerCaisse(nl, nc, dl, dc);
             }
-
-            grille[ligneJoueur][colonneJoueur] = LIBRE;
-            grille[nl][nc] = JOUEUR;
-            ligneJoueur = nl;
-            colonneJoueur = nc;
-            return true;
         }
-
-        // Victoire quand aucune caisse reste
-        boolean partieTerminee() {
-            for (int l = 0; l < grille.length; l++) {
-                for (int c = 0; c < grille[l].length; c++) {
-                    if (grille[l][c] == CAISSE && !objectifs[l][c]) {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
+        return true;
     }
 
-    static class Niveaux {
-
-        static final String[][] NIVEAUX = {
-            {   // Niveau 1
-                "########",
-                "#      #",
-                "#  .   #",
-                "#  $   #",
-                "# @    #",
-                "#      #",
-                "########"
-            },
-            {   // Niveau 2
-                "#########",
-                "#       #",
-                "# .  $  #",
-                "#   @   #",
-                "# .  $  #",
-                "#       #",
-                "#########"
-            },
-            {   // Niveau 3
-                "##########",
-                "#  #     #",
-                "#  #   $ #",
-                "#    $ . #",
-                "# @  # . #",
-                "##########"
-            }
-        };
-
-        static int nombreNiveaux() {
-            return NIVEAUX.length;
+    static final String[][] NIVEAUX = {
+        {   // Niveau 1
+            "########",
+            "#      #",
+            "#  .   #",
+            "#  $   #",
+            "# @    #",
+            "#      #",
+            "########"
+        },
+        {   // Niveau 2
+            "#########",
+            "#       #",
+            "# .  $  #",
+            "#   @   #",
+            "# .  $  #",
+            "#       #",
+            "#########"
+        },
+        {   // Niveau 3
+            "##########",
+            "#  #     #",
+            "#  #   $ #",
+            "#    $ . #",
+            "# @  # . #",
+            "##########"
         }
+    };
 
-        static String[] chargerNiveau(int numero) {
-            return NIVEAUX[numero - 1];
-        }
+    static int nombreNiveaux() {
+        return NIVEAUX.length;
     }
 
-    static class Jeu {
+    static String[] chargerNiveau(int numero) {
+        return NIVEAUX[numero - 1];
+    }
 
-        static boolean commandeValide(String saisie) {
-            if (saisie.length() != 1) {
-                return false;
-            }
-            char c = saisie.charAt(0);
-            return c == 'z' || c == 'q' || c == 's' || c == 'd' || c == 'x';
+    static boolean commandeValide(String saisie) {
+        if (saisie.length() != 1) {
+            return false;
         }
+        char c = saisie.charAt(0);
+        return c == 'z' || c == 'q' || c == 's' || c == 'd' || c == 'x';
+    }
 
-        // Boucle pr un niveau
-        static void jouer(int numeroNiveau, Scanner scanner) {
-            Grille g = new Grille(Niveaux.chargerNiveau(numeroNiveau));
-            int mouvements = 0;
+    // Boucle pr un niveau
+    static void jouer(int numeroNiveau, Scanner scanner) {
+        initialiserGrille(chargerNiveau(numeroNiveau));
+        int mouvements = 0;
 
-            while (true) {
+        while (true) {
+            System.out.println();
+            afficherGrille();
+            System.out.println("Mouvements : " + mouvements);
+            System.out.print("Commande (z=haut, s=bas, q=gauche, d=droite, x=quitter) : ");
+
+            String saisie = scanner.next().toLowerCase();
+
+            if (!commandeValide(saisie)) {
+                System.out.println("Commande invalide.");
+                continue;
+            }
+
+            char commande = saisie.charAt(0);
+
+            if (commande == 'x') {
+                System.out.println("Partie abandonnee.");
+                return;
+            }
+
+            if (deplacerJoueur(commande)) {
+                mouvements++;
+            } else {
+                System.out.println("Deplacement impossible.");
+            }
+
+            if (partieTerminee()) {
                 System.out.println();
-                g.afficherGrille();
-                System.out.println("Mouvements : " + mouvements);
-                System.out.print("Commande (z=haut, s=bas, q=gauche, d=droite, x=quitter) : ");
-
-                String saisie = scanner.next().toLowerCase();
-
-                if (!commandeValide(saisie)) {
-                    System.out.println("Commande invalide.");
-                    continue;
-                }
-
-                char commande = saisie.charAt(0);
-
-                if (commande == 'x') {
-                    System.out.println("Partie abandonnee.");
-                    return;
-                }
-
-                if (g.deplacerJoueur(commande)) {
-                    mouvements++;
-                } else {
-                    System.out.println("Deplacement impossible.");
-                }
-
-                if (g.partieTerminee()) {
-                    System.out.println();
-                    g.afficherGrille();
-                    System.out.println("Victoire !");
-                    System.out.println("Nombre de mouvements : " + mouvements);
-                    return;
-                }
+                afficherGrille();
+                System.out.println("Victoire !");
+                System.out.println("Nombre de mouvements : " + mouvements);
+                return;
             }
         }
     }
@@ -250,7 +242,7 @@ public class Main {
 
             switch (choix) {
                 case 1:
-                    Jeu.jouer(1, scanner);
+                    jouer(1, scanner);
                     break;
                 case 2:
                     choisirNiveau(scanner);
@@ -283,16 +275,16 @@ public class Main {
 
     static void choisirNiveau(Scanner scanner) {
         System.out.println();
-        for (int i = 1; i <= Niveaux.nombreNiveaux(); i++) {
+        for (int i = 1; i <= nombreNiveaux(); i++) {
             System.out.println(i + ". Niveau " + i);
         }
         System.out.print("Numero du niveau : ");
         int numero = lireEntier(scanner);
 
-        if (numero < 1 || numero > Niveaux.nombreNiveaux()) {
+        if (numero < 1 || numero > nombreNiveaux()) {
             System.out.println("Niveau inexistant.");
         } else {
-            Jeu.jouer(numero, scanner);
+            jouer(numero, scanner);
         }
     }
 
